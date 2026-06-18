@@ -96,7 +96,7 @@ const AppState = {
 - [x] **細項 5.1：中文字體直書與牌位視覺 (CSS Writing-mode)**
   * **實作目的**：完美重現台灣傳統神主牌位的文字排列美學。
   * **實作說明**：對 `.ancestral-tablet` 及其子文字欄位套用 `writing-mode: vertical-rl;` 與 `text-align: start;`。使用 `letter-spacing` 微調字體間距。牌位本體利用 CSS `linear-gradient` 營造出紅木紋或金邊沉穩感，並加上 `box-shadow` 產生立體浮雕陰影。
-- [ ] **細項 5.2：動態線香與煙霧粒子系統 (Incense & Smoke Logic)**
+- [x] **細項 5.2：動態線香與煙霧粒子系統 (Incense & Smoke Logic)**
   * **實作目的**：模擬真實點香時，香火明滅與輕煙繚繞的視覺意象。
   * **實作說明**：線香本體點擊「點香」後，啟動計時器。線香高度隨時間比例遞減，頂端使用 CSS 加上微微呼吸閃爍的橘紅色光暈。煙霧效果在線香頂端建立一個煙霧容器，利用 JS 動態生成多個帶有模糊濾鏡的半透明微小圓點，套用向上飄散且隨機向左右位移、逐漸淡出的 CSS Animation。
 - [ ] **細項 5.3：斟酒互動系統 (Wine Cup Interaction)**

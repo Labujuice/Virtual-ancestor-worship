@@ -511,6 +511,162 @@
       box-shadow: 0 0 12px var(--theme-shadow);
       transform: translateY(-1px);
     }
+
+    /* ==========================================
+       細項 5.2: 線香與香爐樣式
+       ========================================== */
+    .smoke-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 8;
+    }
+
+    .censer-container {
+      position: absolute;
+      bottom: 75px; /* 擺放於神桌上 */
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 5;
+      cursor: pointer;
+    }
+
+    .censer {
+      width: 90px;
+      height: 48px;
+      background: radial-gradient(circle at center, #ffd700 0%, #b8860b 80%, #7d5c07 100%);
+      border: 2px solid #ffea70;
+      border-radius: 50% 50% 30% 30% / 30% 30% 70% 70%;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6), inset 0 2px 5px rgba(255,255,255,0.3);
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .censer-container:hover .censer {
+      box-shadow: 0 0 15px var(--theme-shadow), 0 6px 12px rgba(0, 0, 0, 0.6);
+      transform: scale(1.05);
+    }
+
+    /* 香灰 */
+    .censer::before {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 6px;
+      right: 6px;
+      height: 12px;
+      background: radial-gradient(ellipse at center, #8a8580 0%, #5e5a56 100%);
+      border-radius: 50%;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
+      z-index: 1;
+    }
+
+    /* 耳朵/飾條 */
+    .censer::after {
+      content: '';
+      position: absolute;
+      width: 110px;
+      height: 12px;
+      border: 2px solid #ffea70;
+      border-bottom: none;
+      border-radius: 50% 50% 0 0;
+      top: 12px;
+      left: -10px;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    .incense-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: -10px; /* 沒入香灰中 */
+      z-index: 2;
+    }
+
+    .incense-stick {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 4px;
+      height: 140px;
+      transform-origin: bottom;
+      transition: transform 0.3s ease;
+    }
+
+    .incense-body {
+      width: 3px;
+      height: 100px;
+      background: #7a6e67;
+      position: relative;
+      border-radius: 1px;
+      transform-origin: bottom;
+      transition: height 0.2s linear;
+    }
+
+    .incense-stick.lit .incense-body {
+      background: linear-gradient(to bottom, #3b3531 0%, #615650 100%);
+      box-shadow: 0 0 1px rgba(0,0,0,0.5);
+    }
+
+    .incense-handle {
+      width: 1.5px;
+      height: 40px;
+      background: #b81d1d;
+    }
+
+    .incense-tip {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 7px;
+      height: 7px;
+      background: radial-gradient(circle, #ffea70 20%, #ff4500 70%, transparent 100%);
+      border-radius: 50%;
+      display: none;
+      box-shadow: 0 0 8px #ff4500, 0 0 15px #ffea70;
+      animation: incenseGlow 1.2s infinite alternate ease-in-out;
+    }
+
+    .incense-stick.lit .incense-tip {
+      display: block;
+    }
+
+    .smoke-particle {
+      position: absolute;
+      background: radial-gradient(circle, rgba(235, 230, 225, 0.4) 0%, rgba(200, 195, 190, 0.1) 60%, transparent 80%);
+      border-radius: 50%;
+      pointer-events: none;
+      filter: blur(3px);
+      transform: translate(-50%, -50%);
+      animation: riseAndFade 3.5s forwards cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    @keyframes incenseGlow {
+      0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.8; filter: brightness(1); }
+      100% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; filter: brightness(1.4); }
+    }
+
+    @keyframes riseAndFade {
+      0% {
+        transform: translate(-50%, -50%) translateY(0) scale(0.4) translateX(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.65;
+      }
+      100% {
+        transform: translate(-50%, -50%) translateY(-150px) scale(3.5) translateX(var(--drift));
+        opacity: 0;
+      }
+    }
   </style>
 </head>
 <body data-theme="classic-wood">
@@ -545,11 +701,30 @@
         </div>
         <button class="btn-submit" onclick="applyTabletConfig()" style="width: 100%">更新牌位文字</button>
       </div>
+
+      <!-- 線香控制區域 -->
+      <div style="margin-bottom: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--glass-border);">
+        <h3 style="font-size: 0.95rem; color: var(--theme-gold); margin-bottom: 0.8rem; font-family: var(--font-tablet)">線香祭拜控制</h3>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.8rem;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+            <span>狀態：<span id="incense-status" style="color: var(--text-muted)">未點燃</span></span>
+            <span id="incense-timer">180s</span>
+          </div>
+          <div style="width: 100%; height: 6px; background: rgba(0,0,0,0.4); border-radius: 3px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05)">
+            <div id="incense-progress" style="width: 100%; height: 100%; background: linear-gradient(90deg, #ff8c00, #ff0000); transition: width 0.2s linear"></div>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+          <button class="btn-submit" id="btn-incense-light" onclick="lightIncense()" style="margin-top: 0">點燃線香</button>
+          <button class="btn-submit" id="btn-incense-extinguish" onclick="extinguishIncense()" style="margin-top: 0; background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.15)">熄滅</button>
+        </div>
+      </div>
     </section>
 
     <!-- 中央祭祀區 -->
     <section class="altar-container" id="altar-section">
       <div class="altar-decoration"></div>
+      <div class="smoke-layer" id="smoke-layer"></div>
       
       <div class="altar-worship-area">
         <!-- 蠟燭燈光效果 -->
@@ -581,6 +756,31 @@
 
       <!-- 神桌 -->
       <div class="altar-table">
+        <!-- 香爐與線香 (點擊香爐亦可點香) -->
+        <div class="censer-container" onclick="toggleIncense()">
+          <div class="incense-group">
+            <div class="incense-stick" id="incense-1">
+              <div class="incense-body">
+                <div class="incense-tip"></div>
+              </div>
+              <div class="incense-handle"></div>
+            </div>
+            <div class="incense-stick" id="incense-2">
+              <div class="incense-body">
+                <div class="incense-tip"></div>
+              </div>
+              <div class="incense-handle"></div>
+            </div>
+            <div class="incense-stick" id="incense-3">
+              <div class="incense-body">
+                <div class="incense-tip"></div>
+              </div>
+              <div class="incense-handle"></div>
+            </div>
+          </div>
+          <div class="censer"></div>
+        </div>
+
         <!-- 供品放置插槽 (3個) -->
         <div class="offering-slots">
           <div class="offering-slot" id="slot-1"></div>
@@ -704,9 +904,182 @@
       }
     }
 
+    // ==========================================
+    // 5.2 線香與煙霧粒子系統 logic
+    // ==========================================
+    let smokeTimerId = null;
+
+    function initIncense() {
+      // 設定初始線香 UI
+      AppState.incense.timeLeft = CONFIG.incenseBurnDuration;
+      updateIncenseUI();
+    }
+
+    function toggleIncense() {
+      if (AppState.incense.isLit) {
+        extinguishIncense();
+      } else {
+        lightIncense();
+      }
+    }
+
+    function lightIncense() {
+      if (AppState.incense.isLit) return;
+      
+      // 如果已經燃盡，重置時間
+      if (AppState.incense.timeLeft <= 0) {
+        AppState.incense.timeLeft = CONFIG.incenseBurnDuration;
+      }
+
+      AppState.incense.isLit = true;
+      
+      // 點亮線香 DOM
+      document.querySelectorAll('.incense-stick').forEach(stick => {
+        stick.classList.add('lit');
+      });
+
+      // 更新控制面板狀態
+      document.getElementById('incense-status').innerText = "祭拜中";
+      document.getElementById('incense-status').style.color = "#ff8c00";
+      
+      // 啟動倒數計時器
+      AppState.incense.timerId = setInterval(burnTick, 1000);
+      
+      // 啟動煙霧粒子系統
+      startSmokeLoop();
+      
+      // 立即更新 UI
+      updateIncenseUI();
+    }
+
+    function extinguishIncense(isFinished = false) {
+      if (!AppState.incense.isLit) return;
+
+      AppState.incense.isLit = false;
+      
+      // 熄滅線香 DOM
+      document.querySelectorAll('.incense-stick').forEach(stick => {
+        stick.classList.remove('lit');
+      });
+
+      // 清除計時器
+      if (AppState.incense.timerId) {
+        clearInterval(AppState.incense.timerId);
+        AppState.incense.timerId = null;
+      }
+
+      // 停止煙霧
+      stopSmokeLoop();
+
+      // 更新狀態文字
+      const statusEl = document.getElementById('incense-status');
+      if (isFinished) {
+        statusEl.innerText = "已燃盡";
+        statusEl.style.color = "#555";
+        AppState.incense.timeLeft = 0;
+      } else {
+        statusEl.innerText = "已熄滅";
+        statusEl.style.color = varColor('--text-muted');
+      }
+
+      updateIncenseUI();
+    }
+
+    // 安全取得 CSS 變數輔助函式
+    function varColor(varName) {
+      return getComputedStyle(document.body).getPropertyValue(varName).trim();
+    }
+
+    function burnTick() {
+      if (AppState.incense.timeLeft > 0) {
+        AppState.incense.timeLeft--;
+        updateIncenseUI();
+      } else {
+        extinguishIncense(true);
+      }
+    }
+
+    function updateIncenseUI() {
+      const duration = CONFIG.incenseBurnDuration;
+      const timeLeft = AppState.incense.timeLeft;
+      const ratio = timeLeft / duration;
+
+      // 更新計時文字與進度條
+      document.getElementById('incense-timer').innerText = `${timeLeft}s`;
+      document.getElementById('incense-progress').style.width = `${ratio * 100}%`;
+
+      // 縮短香身高度 (線香最大高度設為 100px)
+      const currentHeight = ratio * 100;
+      document.querySelectorAll('.incense-body').forEach(body => {
+        body.style.height = `${currentHeight}px`;
+      });
+    }
+
+    function startSmokeLoop() {
+      if (smokeTimerId) return;
+      
+      function runSmoke() {
+        if (!AppState.incense.isLit) return;
+        
+        const sticks = document.querySelectorAll('.incense-stick.lit');
+        sticks.forEach(stick => {
+          const tip = stick.querySelector('.incense-tip');
+          if (tip && getComputedStyle(tip).display !== 'none') {
+            const rect = tip.getBoundingClientRect();
+            const altar = document.getElementById('altar-section');
+            const altarRect = altar.getBoundingClientRect();
+            
+            const x = rect.left - altarRect.left + rect.width / 2;
+            const y = rect.top - altarRect.top + rect.height / 2;
+            
+            createSmokeParticle(x, y);
+          }
+        });
+
+        // 每 200~400 毫秒產生一次煙霧
+        smokeTimerId = setTimeout(runSmoke, 200 + Math.random() * 200);
+      }
+
+      runSmoke();
+    }
+
+    function stopSmokeLoop() {
+      if (smokeTimerId) {
+        clearTimeout(smokeTimerId);
+        smokeTimerId = null;
+      }
+    }
+
+    function createSmokeParticle(x, y) {
+      const layer = document.getElementById('smoke-layer');
+      if (!layer) return;
+
+      const particle = document.createElement('div');
+      particle.className = 'smoke-particle';
+      
+      const size = Math.random() * 6 + 6; // 6px ~ 12px
+      const drift = Math.random() * 60 - 30; // -30px ~ 30px
+      const duration = Math.random() * 1.5 + 2.5; // 2.5s ~ 4s
+
+      particle.style.left = `${x}px`;
+      particle.style.top = `${y}px`;
+      particle.style.width = `${size}px`;
+      particle.style.height = `${size}px`;
+      particle.style.setProperty('--drift', `${drift}px`);
+      particle.style.animationDuration = `${duration}s`;
+
+      layer.appendChild(particle);
+
+      // 動畫結束後自動移除 DOM
+      setTimeout(() => {
+        particle.remove();
+      }, duration * 1000);
+    }
+
     // 視窗載入後初始化
     window.addEventListener('DOMContentLoaded', () => {
       initTablet();
+      initIncense();
     });
   </script>
 </body>
