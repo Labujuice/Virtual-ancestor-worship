@@ -93,7 +93,7 @@ const AppState = {
 
 ## 5. 核心工作細項與實作說明 (Work Breakdown Structure)
 
-- [ ] **細項 5.1：中文字體直書與牌位視覺 (CSS Writing-mode)**
+- [x] **細項 5.1：中文字體直書與牌位視覺 (CSS Writing-mode)**
   * **實作目的**：完美重現台灣傳統神主牌位的文字排列美學。
   * **實作說明**：對 `.ancestral-tablet` 及其子文字欄位套用 `writing-mode: vertical-rl;` 與 `text-align: start;`。使用 `letter-spacing` 微調字體間距。牌位本體利用 CSS `linear-gradient` 營造出紅木紋或金邊沉穩感，並加上 `box-shadow` 產生立體浮雕陰影。
 - [ ] **細項 5.2：動態線香與煙霧粒子系統 (Incense & Smoke Logic)**

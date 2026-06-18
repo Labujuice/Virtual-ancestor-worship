@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>數位祭祖互動介面 - 慎終追遠</title>
+  <!-- 載入 Noto Serif TC (用於牌位) 與 Outfit (用於 UI) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ==========================================
+       設計系統與變數 (Design System & Variables)
+       ========================================== */
+    :root {
+      --font-ui: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-tablet: 'Noto Serif TC', serif;
+      
+      /* 經典木紋主題 (Classic Wood) */
+      --wood-dark: #1f0f08;
+      --wood-medium: #3d1d11;
+      --wood-light: #5a2e1d;
+      --gold-primary: #ffd700;
+      --gold-glowing: #ffea70;
+      --gold-dark: #b8860b;
+      
+      /* 宮廟紅主題 (Temple Red) */
+      --temple-dark: #2b0000;
+      --temple-medium: #660000;
+      --temple-light: #990000;
+      --temple-accent: #cc0000;
+      
+      /* 通用顏色 */
+      --bg-dark: #0c0808;
+      --bg-gradient: radial-gradient(circle at center, #1c1212 0%, #080505 100%);
+      --text-light: #f5f0eb;
+      --text-muted: #a89f95;
+      --glass-bg: rgba(30, 20, 20, 0.65);
+      --glass-border: rgba(255, 215, 0, 0.15);
+      --glass-shadow: rgba(0, 0, 0, 0.5);
+      
+      /* 預設主題變數（動態切換） */
+      --theme-bg-dark: var(--wood-dark);
+      --theme-bg-medium: var(--wood-medium);
+      --theme-bg-light: var(--wood-light);
+      --theme-gold: var(--gold-primary);
+      --theme-gold-dark: var(--gold-dark);
+      --theme-border: var(--gold-primary);
+      --theme-shadow: rgba(255, 215, 0, 0.2);
+    }
+
+    [data-theme="temple-red"] {
+      --theme-bg-dark: var(--temple-dark);
+      --theme-bg-medium: var(--temple-medium);
+      --theme-bg-light: var(--temple-light);
+      --theme-gold: #ffd700;
+      --theme-gold-dark: #d4af37;
+      --theme-border: #ffd700;
+      --theme-shadow: rgba(212, 175, 55, 0.25);
+    }
+
+    /* ==========================================
+       基礎重設與版面配置 (Reset & Layout)
+       ========================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-ui);
+      background: var(--bg-gradient);
+      color: var(--text-light);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* 頂部導覽列 */
+    header {
+      background: rgba(15, 10, 10, 0.85);
+      border-bottom: 1px solid var(--glass-border);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    header h1 {
+      font-family: var(--font-tablet);
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #ffd700, #ff8c00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .theme-selector {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-theme {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--text-light);
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-family: var(--font-ui);
+      transition: all 0.3s ease;
+    }
+
+    .btn-theme.active {
+      background: var(--theme-bg-medium);
+      border-color: var(--theme-gold);
+      color: var(--theme-gold);
+      box-shadow: 0 0 10px var(--theme-shadow);
+    }
+
+    /* 主要容器 */
+    .container {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 320px 1fr 340px;
+      gap: 1.5rem;
+      padding: 1.5rem;
+      max-width: 1600px;
+      margin: 0 auto;
+      width: 100%;
+      height: calc(100vh - 70px);
+    }
+
+    @media (max-width: 1100px) {
+      .container {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        height: auto;
+        overflow-y: auto;
+        max-width: 800px;
+      }
+    }
+
+    /* 通用面板樣式 */
+    .panel {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px var(--glass-shadow);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      height: 100%;
+      overflow-y: auto;
+    }
+
+    @media (max-width: 1100px) {
+      .panel {
+        height: auto;
+      }
+    }
+
+    .panel-title {
+      font-family: var(--font-tablet);
+      font-size: 1.2rem;
+      color: var(--theme-gold);
+      border-bottom: 2px solid var(--theme-bg-medium);
+      padding-bottom: 0.5rem;
+      margin-bottom: 0.5rem;
+      letter-spacing: 1px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* ==========================================
+       細項 5.1: 祖先牌位與祭祀區樣式
+       ========================================== */
+    .altar-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      background: radial-gradient(circle at top, rgba(60, 30, 20, 0.2) 0%, rgba(10, 5, 5, 0.9) 100%);
+      border: 1px solid rgba(255, 215, 0, 0.1);
+      border-radius: 12px;
+      position: relative;
+      padding: 2rem;
+      overflow: hidden;
+    }
+
+    /* 頂部裝飾黃金掛軸/飾條 */
+    .altar-decoration {
+      width: 100%;
+      height: 10px;
+      background: linear-gradient(90deg, transparent 5%, var(--theme-gold) 15%, var(--theme-gold-dark) 50%, var(--theme-gold) 85%, transparent 95%);
+      position: absolute;
+      top: 0;
+      left: 0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    /* 祭祀核心區域 */
+    .altar-worship-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      width: 100%;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    /* 蠟燭與燈光 */
+    .altar-backdrop-lights {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+      padding: 0 2rem;
+      z-index: 1;
+    }
+
+    .candle {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 220px;
+      position: relative;
+    }
+
+    .candle-body {
+      width: 14px;
+      height: 140px;
+      background: linear-gradient(90deg, #b30000, #ff3333, #800000);
+      border-radius: 4px 4px 0 0;
+      position: relative;
+      box-shadow: 0 0 15px rgba(255, 0, 0, 0.2);
+    }
+
+    .candle-body::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 10px;
+      background: #333;
+    }
+
+    .candle-flame {
+      width: 16px;
+      height: 32px;
+      background: radial-gradient(circle at bottom, #ff8c00 20%, #ff0000 70%, transparent 100%);
+      border-radius: 50% 50% 20% 20% / 60% 60% 40% 40%;
+      position: absolute;
+      top: -24px;
+      animation: flicker 0.15s infinite alternate ease-in-out;
+      filter: blur(0.5px);
+      box-shadow: 0 0 20px rgba(255, 140, 0, 0.8), 0 0 40px rgba(255, 69, 0, 0.4);
+    }
+
+    .candle-stand {
+      width: 32px;
+      height: 15px;
+      background: linear-gradient(90deg, #9f7b1e, #ffd700, #9f7b1e);
+      border-radius: 3px;
+      margin-top: -1px;
+    }
+
+    @keyframes flicker {
+      0% { transform: scale(0.96) rotate(-1deg); opacity: 0.9; }
+      100% { transform: scale(1.04) rotate(1deg); opacity: 1; }
+    }
+
+    /* 祖先牌位 (Ancestral Tablet) */
+    .ancestral-tablet {
+      width: 220px;
+      height: 340px;
+      background: linear-gradient(135deg, var(--theme-bg-dark) 0%, #110805 100%);
+      border: 6px double var(--theme-gold);
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0,0,0,0.8);
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem 1rem;
+      z-index: 2;
+      transition: all 0.5s ease;
+    }
+
+    /* 牌位金邊與雕刻框 */
+    .ancestral-tablet::before {
+      content: '';
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      right: 4px;
+      bottom: 4px;
+      border: 1px solid var(--theme-gold-dark);
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .tablet-roof {
+      position: absolute;
+      top: -16px;
+      width: 240px;
+      height: 16px;
+      background: linear-gradient(90deg, var(--theme-bg-dark), var(--theme-bg-medium), var(--theme-bg-dark));
+      border: 2px solid var(--theme-gold);
+      border-radius: 4px 4px 0 0;
+      clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
+      box-shadow: 0 -4px 10px rgba(0,0,0,0.5);
+    }
+
+    .tablet-base {
+      position: absolute;
+      bottom: -15px;
+      width: 250px;
+      height: 16px;
+      background: linear-gradient(90deg, var(--theme-bg-dark), var(--theme-bg-medium), var(--theme-bg-dark));
+      border: 2px solid var(--theme-gold);
+      border-radius: 2px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+    }
+
+    .tablet-base-sub {
+      position: absolute;
+      bottom: -27px;
+      width: 270px;
+      height: 12px;
+      background: linear-gradient(90deg, #0c0503, var(--theme-bg-dark), #0c0503);
+      border-radius: 4px;
+    }
+
+    /* 直書文字欄位 */
+    .tablet-content {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      height: 100%;
+      font-family: var(--font-tablet);
+      color: var(--theme-gold);
+      text-shadow: 0 0 2px rgba(255, 215, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.8);
+    }
+
+    .tablet-column {
+      writing-mode: vertical-rl;
+      text-align: start;
+      line-height: 1.4;
+      letter-spacing: 4px;
+      white-space: nowrap;
+    }
+
+    .tablet-column.left {
+      font-size: 0.85rem;
+      width: 15%;
+      color: var(--text-muted);
+      opacity: 0.85;
+      padding-top: 1.5rem;
+    }
+
+    .tablet-column.center {
+      font-size: 1.5rem;
+      font-weight: 900;
+      width: 60%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      letter-spacing: 8px;
+      color: var(--theme-gold);
+      text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+    }
+
+    .tablet-column.right {
+      font-size: 0.85rem;
+      width: 15%;
+      color: var(--text-muted);
+      opacity: 0.85;
+      padding-top: 2.5rem;
+    }
+
+    /* 神桌 (Altar Table) 與擺放區域 */
+    .altar-table {
+      width: 100%;
+      height: 160px;
+      background: linear-gradient(0deg, #110502 0%, var(--theme-bg-medium) 40%, var(--theme-bg-light) 90%, #6f3b25 100%);
+      border: 3px solid var(--theme-gold-dark);
+      border-top: 6px solid var(--theme-gold);
+      border-radius: 6px 6px 12px 12px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      z-index: 3;
+      padding: 0.5rem 1rem;
+    }
+
+    /* 供品放置插槽 */
+    .offering-slots {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      margin-top: 5px;
+      gap: 10px;
+    }
+
+    .offering-slot {
+      width: 70px;
+      height: 70px;
+      border: 1px dashed rgba(255, 215, 0, 0.2);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      background: rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .offering-slot::before {
+      content: '供品位';
+      font-size: 0.65rem;
+      color: rgba(255, 215, 0, 0.25);
+      position: absolute;
+    }
+
+    .offering-slot.filled::before {
+      display: none;
+    }
+
+    /* 三只酒杯 */
+    .cups-area {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 15px;
+      z-index: 4;
+    }
+
+    .cup-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    /* 設定控制面板表單 */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .form-group label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .form-group input, .form-group select {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--glass-border);
+      border-radius: 4px;
+      padding: 0.5rem;
+      color: var(--text-light);
+      font-family: var(--font-ui);
+      font-size: 0.9rem;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+      outline: none;
+      border-color: var(--theme-gold);
+      box-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+    }
+
+    .btn-submit {
+      background: linear-gradient(135deg, var(--theme-bg-medium), var(--theme-bg-light));
+      border: 1px solid var(--theme-gold);
+      color: var(--text-light);
+      padding: 0.6rem 1rem;
+      border-radius: 4px;
+      font-family: var(--font-ui);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 0.5rem;
+    }
+
+    .btn-submit:hover {
+      box-shadow: 0 0 12px var(--theme-shadow);
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body data-theme="classic-wood">
+
+  <header>
+    <h1>數位祭祖公媽廳</h1>
+    <div class="theme-selector">
+      <button class="btn-theme active" onclick="switchTheme('classic-wood')">古風木紋</button>
+      <button class="btn-theme" onclick="switchTheme('temple-red')">宮廟宮廷紅</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- 左側控制面板 -->
+    <section class="panel" id="control-panel">
+      <h2 class="panel-title">互動控制面板</h2>
+      
+      <!-- 設定區域 -->
+      <div style="margin-bottom: 1.5rem;">
+        <h3 style="font-size: 0.95rem; color: var(--theme-gold); margin-bottom: 0.8rem; font-family: var(--font-tablet)">公媽牌位客製</h3>
+        <div class="form-group">
+          <label for="cfg-centerColumn">正中神位</label>
+          <input type="text" id="cfg-centerColumn" value="詹氏歷代祖先神位">
+        </div>
+        <div class="form-group">
+          <label for="cfg-leftColumn">左側紀年 (生卒/年節)</label>
+          <input type="text" id="cfg-leftColumn" value="西元二零二六端午吉旦">
+        </div>
+        <div class="form-group">
+          <label for="cfg-rightColumn">右側落款 (陽上子孫)</label>
+          <input type="text" id="cfg-rightColumn" value="陽上子孫叩拜">
+        </div>
+        <button class="btn-submit" onclick="applyTabletConfig()" style="width: 100%">更新牌位文字</button>
+      </div>
+    </section>
+
+    <!-- 中央祭祀區 -->
+    <section class="altar-container" id="altar-section">
+      <div class="altar-decoration"></div>
+      
+      <div class="altar-worship-area">
+        <!-- 蠟燭燈光效果 -->
+        <div class="altar-backdrop-lights">
+          <div class="candle">
+            <div class="candle-flame"></div>
+            <div class="candle-body"></div>
+            <div class="candle-stand"></div>
+          </div>
+          <div class="candle">
+            <div class="candle-flame"></div>
+            <div class="candle-body"></div>
+            <div class="candle-stand"></div>
+          </div>
+        </div>
+        
+        <!-- 祖先牌位 -->
+        <div class="ancestral-tablet" id="ancestral-tablet">
+          <div class="tablet-roof"></div>
+          <div class="tablet-content">
+            <div class="tablet-column left" id="tablet-left">西元二零二六端午吉旦</div>
+            <div class="tablet-column center" id="tablet-center">詹氏歷代祖先神位</div>
+            <div class="tablet-column right" id="tablet-right">陽上子孫叩拜</div>
+          </div>
+          <div class="tablet-base"></div>
+          <div class="tablet-base-sub"></div>
+        </div>
+      </div>
+
+      <!-- 神桌 -->
+      <div class="altar-table">
+        <!-- 供品放置插槽 (3個) -->
+        <div class="offering-slots">
+          <div class="offering-slot" id="slot-1"></div>
+          <div class="offering-slot" id="slot-2"></div>
+          <div class="offering-slot" id="slot-3"></div>
+        </div>
+        
+        <!-- 酒杯放置區 -->
+        <div class="cups-area">
+          <div class="cup-container" onclick="toggleCup(1)">
+            <div style="font-size: 0.7rem; margin-bottom: 2px; color: var(--text-muted)">一巡</div>
+            <div class="wine-cup-placeholder" style="color: var(--theme-gold)">🍷</div>
+          </div>
+          <div class="cup-container" onclick="toggleCup(2)">
+            <div style="font-size: 0.7rem; margin-bottom: 2px; color: var(--text-muted)">二巡</div>
+            <div class="wine-cup-placeholder" style="color: var(--theme-gold)">🍷</div>
+          </div>
+          <div class="cup-container" onclick="toggleCup(3)">
+            <div style="font-size: 0.7rem; margin-bottom: 2px; color: var(--text-muted)">三巡</div>
+            <div class="wine-cup-placeholder" style="color: var(--theme-gold)">🍷</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 右側金爐區 -->
+    <section class="panel" id="burner-panel">
+      <h2 class="panel-title">化金金爐區</h2>
+      <div>
+        <p style="font-size: 0.9rem; color: var(--text-muted)">金爐區域與化金功能準備中...</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // ==========================================
+    // 使用者客製化設定區 (User Configuration)
+    // ==========================================
+    const CONFIG = {
+      // 祖先牌位文字 (由上至下直書)
+      tablet: {
+        leftColumn: "西元二零二六端午吉旦",
+        centerColumn: "詹氏歷代祖先神位",
+        rightColumn: "陽上子孫叩拜"
+      },
+      // 初始金紙數量
+      initialJossPaper: 50,
+      // 線香燃燒時間 (單位：秒)
+      incenseBurnDuration: 180,
+      // 介面風格主題: 'classic-wood' (古風木紋) | 'temple-red' (宮廟宮廷紅)
+      theme: "classic-wood"
+    };
+
+    // ==========================================
+    // 應用程式狀態管理器 (State Management)
+    // ==========================================
+    const AppState = {
+      incense: {
+        isLit: false,
+        timeLeft: CONFIG.incenseBurnDuration,
+        timerId: null
+      },
+      cups: [
+        { id: 1, filled: false },
+        { id: 2, filled: false },
+        { id: 3, filled: false }
+      ],
+      currentOfferings: [], // 儲存目前擺放在桌上的供品 ID
+      jossPaperCount: CONFIG.initialJossPaper,
+      isBurningGold: false
+    };
+
+    // ==========================================
+    // 5.1 牌位初始化與文字設定 logic
+    // ==========================================
+    function initTablet() {
+      // 讀取設定檔填入輸入框與網頁元件
+      document.getElementById('cfg-centerColumn').value = CONFIG.tablet.centerColumn;
+      document.getElementById('cfg-leftColumn').value = CONFIG.tablet.leftColumn;
+      document.getElementById('cfg-rightColumn').value = CONFIG.tablet.rightColumn;
+      
+      updateTabletUI();
+      switchTheme(CONFIG.theme);
+    }
+
+    function updateTabletUI() {
+      document.getElementById('tablet-center').innerText = CONFIG.tablet.centerColumn;
+      document.getElementById('tablet-left').innerText = CONFIG.tablet.leftColumn;
+      document.getElementById('tablet-right').innerText = CONFIG.tablet.rightColumn;
+    }
+
+    function applyTabletConfig() {
+      CONFIG.tablet.centerColumn = document.getElementById('cfg-centerColumn').value;
+      CONFIG.tablet.leftColumn = document.getElementById('cfg-leftColumn').value;
+      CONFIG.tablet.rightColumn = document.getElementById('cfg-rightColumn').value;
+      updateTabletUI();
+    }
+
+    // 主題切換邏輯
+    function switchTheme(themeName) {
+      document.body.setAttribute('data-theme', themeName);
+      CONFIG.theme = themeName;
+      
+      // 更新按鈕 active 樣式
+      const buttons = document.querySelectorAll('.btn-theme');
+      buttons.forEach(btn => {
+        if (btn.getAttribute('onclick').includes(themeName)) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    }
+
+    // 暫時的酒杯點擊佔位符
+    function toggleCup(cupId) {
+      const cup = AppState.cups.find(c => c.id === cupId);
+      if (cup) {
+        cup.filled = !cup.filled;
+        alert(`酒杯 ${cupId} 被點擊了，目前狀態: ${cup.filled ? '已斟酒' : '未斟酒'}`);
+      }
+    }
+
+    // 視窗載入後初始化
+    window.addEventListener('DOMContentLoaded', () => {
+      initTablet();
+    });
+  </script>
+</body>
+</html>
