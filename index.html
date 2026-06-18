@@ -334,6 +334,24 @@
       transition: all 0.5s ease;
     }
 
+    /* 牌位發光 (三巡奠酒圓滿聖光特效) */
+    .ancestral-tablet.holy-glow {
+      box-shadow: 0 0 35px rgba(255, 215, 0, 0.85), inset 0 0 20px rgba(0,0,0,0.8);
+      filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.9)) drop-shadow(0 0 30px rgba(255, 140, 0, 0.7));
+      animation: holyPulse 1.8s infinite alternate ease-in-out;
+    }
+
+    @keyframes holyPulse {
+      0% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.8)) drop-shadow(0 0 25px rgba(255, 140, 0, 0.6));
+      }
+      100% {
+        transform: scale(1.04);
+        filter: drop-shadow(0 0 22px rgba(255, 215, 0, 1)) drop-shadow(0 0 45px rgba(255, 69, 0, 0.8));
+      }
+    }
+
     /* 牌位金邊與雕刻框 */
     .ancestral-tablet::before {
       content: '';
@@ -444,26 +462,26 @@
       padding: 0.5rem 1rem;
     }
 
-    /* 供品放置插槽 (7個前後排) */
+    /* 供品放置插槽 (7個前後排，使用 CSS Grid 排版) */
     .offering-slots {
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-template-rows: auto auto;
+      gap: 8px 0;
+      width: 100%;
+      margin-top: 8px;
+      justify-items: center;
       align-items: center;
-      gap: 6px;
-      width: 100%;
-      margin-top: 5px;
     }
 
-    .offering-row {
-      display: flex;
-      justify-content: center;
-      width: 100%;
-      gap: 12px;
-    }
-
-    .offering-row.back-row {
-      margin-bottom: 2px;
-    }
+    /* 劃分前後排插槽的 Grid 區域，精準對齊防摔車 */
+    #slot-1 { grid-column: 2 / span 2; grid-row: 1; }
+    #slot-2 { grid-column: 4 / span 2; grid-row: 1; }
+    #slot-3 { grid-column: 8 / span 2; grid-row: 1; }
+    #slot-4 { grid-column: 10 / span 2; grid-row: 1; }
+    #slot-5 { grid-column: 3 / span 2; grid-row: 2; }
+    #slot-6 { grid-column: 6 / span 2; grid-row: 2; }
+    #slot-7 { grid-column: 9 / span 2; grid-row: 2; }
 
     .offering-slot {
       width: 58px;
@@ -634,6 +652,7 @@
     .incense-stick {
       display: flex;
       flex-direction: column;
+      justify-content: flex-end; /* 修正：內容對齊底部，讓香在縮短時 tip 從頂部往下移，且 handle 不會上移 */
       align-items: center;
       width: 4px;
       height: 140px;
@@ -673,7 +692,7 @@
       border-radius: 50%;
       display: none;
       box-shadow: 0 0 8px #ff4500, 0 0 15px #ffea70;
-      animation: incenseGlow 1.2s infinite alternate ease-in-out;
+      animation: incenseGlow 0.9s infinite ease-in-out; /* 改為更真實的呼吸閃爍 */
     }
 
     .incense-stick.lit .incense-tip {
@@ -691,8 +710,31 @@
     }
 
     @keyframes incenseGlow {
-      0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.8; filter: brightness(1); }
-      100% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; filter: brightness(1.4); }
+      0%, 100% {
+        transform: translate(-50%, -50%) scale(0.9);
+        opacity: 0.8;
+        filter: brightness(1) drop-shadow(0 0 4px rgba(255, 69, 0, 0.5));
+      }
+      20% {
+        transform: translate(-50%, -50%) scale(1.15);
+        opacity: 0.95;
+        filter: brightness(1.2) drop-shadow(0 0 7px rgba(255, 69, 0, 0.8));
+      }
+      45% {
+        transform: translate(-50%, -50%) scale(1.0);
+        opacity: 0.85;
+        filter: brightness(1.05) drop-shadow(0 0 5px rgba(255, 69, 0, 0.6));
+      }
+      70% {
+        transform: translate(-50%, -50%) scale(1.25);
+        opacity: 1;
+        filter: brightness(1.35) drop-shadow(0 0 9px rgba(255, 234, 112, 0.85)) drop-shadow(0 0 14px rgba(255, 69, 0, 0.6));
+      }
+      85% {
+        transform: translate(-50%, -50%) scale(1.05);
+        opacity: 0.9;
+        filter: brightness(1.1) drop-shadow(0 0 6px rgba(255, 69, 0, 0.7));
+      }
     }
 
     @keyframes riseAndFade {
@@ -747,7 +789,7 @@
       background: linear-gradient(0deg, #660000 0%, #cc0000 70%, #ff3333 100%);
       transform-origin: bottom;
       transform: scaleY(0);
-      transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: transform 2.0s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .wine-cup.filled .cup-liquid {
@@ -976,8 +1018,28 @@
       z-index: 3;
     }
 
-    .furnace.burning .flame-container {
+    .furnace.burning .flame-container,
+    .furnace.super-burning .flame-container {
       opacity: 1;
+    }
+
+    .furnace.super-burning .flame-1 {
+      height: 65px;
+      width: 35px;
+      animation-duration: 0.3s !important;
+    }
+
+    .furnace.super-burning .flame-2 {
+      height: 85px;
+      width: 45px;
+      animation-duration: 0.4s !important;
+      background: radial-gradient(circle at bottom, #ffffff 20%, #ffea70 50%, #ff2200 90%, transparent 100%);
+    }
+
+    .furnace.super-burning .flame-3 {
+      height: 65px;
+      width: 35px;
+      animation-duration: 0.35s !important;
     }
 
     .flame {
@@ -1211,19 +1273,15 @@
           <div class="censer"></div>
         </div>
 
-        <!-- 供品放置插槽 (7個前後排) -->
+        <!-- 供品放置插槽 (7個前後排，使用 Grid 佈局) -->
         <div class="offering-slots">
-          <div class="offering-row back-row">
-            <div class="offering-slot" id="slot-1" title="後排左一"></div>
-            <div class="offering-slot" id="slot-2" title="後排左二"></div>
-            <div class="offering-slot" id="slot-3" title="後排右二"></div>
-            <div class="offering-slot" id="slot-4" title="後排右一"></div>
-          </div>
-          <div class="offering-row front-row">
-            <div class="offering-slot" id="slot-5" title="前排左"></div>
-            <div class="offering-slot" id="slot-6" title="前排中"></div>
-            <div class="offering-slot" id="slot-7" title="前排右"></div>
-          </div>
+          <div class="offering-slot" id="slot-1" title="後排左一"></div>
+          <div class="offering-slot" id="slot-2" title="後排左二"></div>
+          <div class="offering-slot" id="slot-3" title="後排右二"></div>
+          <div class="offering-slot" id="slot-4" title="後排右一"></div>
+          <div class="offering-slot" id="slot-5" title="前排左"></div>
+          <div class="offering-slot" id="slot-6" title="前排中"></div>
+          <div class="offering-slot" id="slot-7" title="前排右"></div>
         </div>
         
         <!-- 酒杯放置區 -->
@@ -1272,7 +1330,7 @@
           <div style="font-size: 0.8rem; color: var(--text-muted)">金紙餘量</div>
           <div style="font-size: 1.5rem; font-weight: 700; color: var(--theme-gold);" id="joss-count-text">50 張</div>
         </div>
-        <button class="btn-submit" onclick="refillJossPaper()" style="margin-top: 0; padding: 0.4rem 0.8rem; font-size: 0.8rem;">補滿金紙</button>
+        <button class="btn-submit" id="btn-refill-joss" onclick="refillJossPaper()" style="margin-top: 0; padding: 0.4rem 0.8rem; font-size: 0.8rem;">補滿金紙</button>
       </div>
 
       <!-- 互動區域 -->
@@ -1305,10 +1363,11 @@
       </div>
 
       <!-- 按鈕控制 -->
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-        <button class="btn-submit" onclick="burnOne()" style="margin-top: 0">燒一張</button>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.5rem;">
+        <button class="btn-submit" onclick="burnOne()" id="btn-burn-one" style="margin-top: 0">燒一張</button>
         <button class="btn-submit" id="btn-auto-burn" onclick="toggleAutoBurn()" style="margin-top: 0; background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.15)">自動連燒</button>
       </div>
+      <button class="btn-submit" id="btn-all-in" onclick="allInJossPaper()" style="margin-top: 0; width: 100%; background: linear-gradient(135deg, #d35400, #e67e22); border-color: #ffd700; font-size: 0.95rem; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">一鍵梭哈 (全部化金)</button>
     </section>
 
     <!-- 底部供品選單 -->
@@ -1358,7 +1417,8 @@
       ],
       currentOfferings: [], // 儲存目前擺放在桌上的供品 ID
       jossPaperCount: CONFIG.initialJossPaper,
-      isBurningGold: false
+      isBurningGold: false,
+      isAllIn: false
     };
 
     // ==========================================
@@ -1625,17 +1685,21 @@
     function updatePouringStatus() {
       const filledCount = AppState.cups.filter(c => c.filled).length;
       const statusEl = document.getElementById('wine-status');
+      const tabletEl = document.getElementById('ancestral-tablet');
       if (!statusEl) return;
       
       if (filledCount === 0) {
         statusEl.innerText = "未奠酒";
         statusEl.style.color = "#a89f95"; // text-muted
+        if (tabletEl) tabletEl.classList.remove('holy-glow');
       } else if (filledCount === 3) {
         statusEl.innerText = "三巡已完備 (奠酒三巡圓滿)";
         statusEl.style.color = "#4caf50"; // green
+        if (tabletEl) tabletEl.classList.add('holy-glow');
       } else {
         statusEl.innerText = `已完成 ${filledCount} 巡`;
         statusEl.style.color = "#ffd700"; // gold
+        if (tabletEl) tabletEl.classList.remove('holy-glow');
       }
     }
 
@@ -1811,7 +1875,22 @@
       }).join('');
     }
 
-    // 點擊供品：如果在桌上就收回，否則找空位擺上
+    function getTargetSlotForOffering(offeringId) {
+      if (offeringId === 'chicken') return 4; // slot-5 (前排左)
+      if (offeringId === 'pork') return 5;    // slot-6 (前排中)
+      if (offeringId === 'fish') return 6;    // slot-7 (前排右)
+      
+      // 水果、糕點、鮮花放置於後排 slots (1~4)，即 indices [0, 1, 2, 3]
+      const backRowIndices = [0, 1, 2, 3];
+      for (const idx of backRowIndices) {
+        if (AppState.currentOfferings[idx] === null) {
+          return idx;
+        }
+      }
+      return -1; // 後排已滿
+    }
+
+    // 點擊供品：根據種類防摔車排版，三牲放前排，其餘放後排，點擊已擺放的則收回
     function toggleOffering(offeringId) {
       const placedIndex = AppState.currentOfferings.indexOf(offeringId);
       
@@ -1819,13 +1898,24 @@
         // 已在桌上，收回
         AppState.currentOfferings[placedIndex] = null;
       } else {
-        // 未在桌上，尋找第一個空位放置
-        const emptyIndex = AppState.currentOfferings.indexOf(null);
-        if (emptyIndex === -1) {
-          alert("供品桌已擺滿！請先點擊桌上的供品或收回既有供品。");
-          return;
+        // 未在桌上，尋找對應位置放置
+        if (offeringId === 'chicken' || offeringId === 'pork' || offeringId === 'fish') {
+          const targetIdx = getTargetSlotForOffering(offeringId);
+          if (AppState.currentOfferings[targetIdx] !== null) {
+            const currentItem = OFFERINGS.find(o => o.id === AppState.currentOfferings[targetIdx]);
+            alert(`前排專屬聖位已被 ${currentItem.name} 佔用！`);
+            return;
+          }
+          AppState.currentOfferings[targetIdx] = offeringId;
+        } else {
+          // 後排水果/糕點/鮮花
+          const targetIdx = getTargetSlotForOffering(offeringId);
+          if (targetIdx === -1) {
+            alert("後排供品桌已擺滿！請先收回既有水果/糕點/鮮花。");
+            return;
+          }
+          AppState.currentOfferings[targetIdx] = offeringId;
         }
-        AppState.currentOfferings[emptyIndex] = offeringId;
       }
 
       renderOfferingSelectionList();
@@ -2020,6 +2110,75 @@
     function refillJossPaper() {
       AppState.jossPaperCount = CONFIG.initialJossPaper;
       updateBurnerUI();
+    }
+
+    let allInIntervalId = null;
+
+    function allInJossPaper() {
+      if (AppState.jossPaperCount <= 0) {
+        alert("金紙已經燒完了！請點擊『補滿金紙』。");
+        return;
+      }
+
+      if (AppState.isAllIn) return;
+
+      // 如果正在自動連燒，先停止自動連燒
+      if (AppState.isBurningGold) {
+        stopAutoBurn();
+      }
+
+      AppState.isAllIn = true;
+
+      // 讓爐火變為 super-burning 超大狀態
+      const furnace = document.getElementById('furnace');
+      if (furnace) {
+        furnace.classList.add('super-burning');
+      }
+
+      // 禁用所有相關按鈕以防干擾
+      const btnAllIn = document.getElementById('btn-all-in');
+      const btnBurnOne = document.getElementById('btn-burn-one');
+      const btnAutoBurn = document.getElementById('btn-auto-burn');
+      const btnRefillJoss = document.getElementById('btn-refill-joss');
+      
+      if (btnAllIn) {
+        btnAllIn.disabled = true;
+        btnAllIn.innerText = "超渡中...";
+        btnAllIn.style.opacity = "0.7";
+      }
+      if (btnBurnOne) btnBurnOne.disabled = true;
+      if (btnAutoBurn) btnAutoBurn.disabled = true;
+      if (btnRefillJoss) btnRefillJoss.disabled = true;
+
+      // 每 60 毫秒燒一張金紙 (如機關槍般瘋狂飛入)
+      allInIntervalId = setInterval(() => {
+        if (AppState.jossPaperCount > 0) {
+          AppState.jossPaperCount--;
+          updateBurnerUI();
+          spawnFlyingPaper();
+        } else {
+          // 全部化金完成
+          clearInterval(allInIntervalId);
+          allInIntervalId = null;
+          AppState.isAllIn = false;
+
+          if (furnace) {
+            furnace.classList.remove('super-burning');
+          }
+
+          // 恢復按鈕狀態
+          if (btnAllIn) {
+            btnAllIn.disabled = false;
+            btnAllIn.innerText = "一鍵梭哈 (全部化金)";
+            btnAllIn.style.opacity = "1";
+          }
+          if (btnBurnOne) btnBurnOne.disabled = false;
+          if (btnAutoBurn) btnAutoBurn.disabled = false;
+          if (btnRefillJoss) btnRefillJoss.disabled = false;
+
+          alert("功德圓滿！遊子業障當場消散！");
+        }
+      }, 60);
     }
 
     // 視窗載入後初始化
