@@ -2,6 +2,8 @@
 
 「慎終追遠，民德歸厚矣。」
 
+👉 **線上即時體驗網址**：[https://labujuice.github.io/Virtual-ancestor-worship/](https://labujuice.github.io/Virtual-ancestor-worship/)
+
 本專案是一個無須架設伺服器、雙擊即可執行的**單一 HTML 數位公媽廳（祭祖互動介面）**。旨在還原傳統祭祖儀式感，協助身處異鄉的遊子跨越時空與地理限制，在現代瀏覽器中以莊嚴且溫馨的視覺效果進行思念與追悼。
 
 ---
