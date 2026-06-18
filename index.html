@@ -667,6 +667,66 @@
         opacity: 0;
       }
     }
+
+    /* ==========================================
+       細項 5.3: 斟酒與酒杯樣式
+       ========================================== */
+    .wine-cup {
+      width: 24px;
+      height: 38px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .wine-cup:hover {
+      transform: scale(1.15);
+    }
+
+    .cup-body {
+      width: 24px;
+      height: 18px;
+      background: linear-gradient(135deg, #ffd700 0%, #b8860b 80%, #7d5c07 100%);
+      border: 1px solid #ffea70;
+      border-radius: 0 0 12px 12px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.4), inset 0 1px 3px rgba(255,255,255,0.4);
+    }
+
+    .cup-liquid {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 85%;
+      background: linear-gradient(0deg, #660000 0%, #cc0000 70%, #ff3333 100%);
+      transform-origin: bottom;
+      transform: scaleY(0);
+      transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .wine-cup.filled .cup-liquid {
+      transform: scaleY(1);
+    }
+
+    .cup-stem {
+      width: 4px;
+      height: 14px;
+      background: linear-gradient(90deg, #b8860b, #ffd700, #b8860b);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .cup-base {
+      width: 20px;
+      height: 6px;
+      background: linear-gradient(90deg, #b8860b, #ffd700, #b8860b);
+      border-radius: 3px 3px 0 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
   </style>
 </head>
 <body data-theme="classic-wood">
@@ -717,6 +777,20 @@
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
           <button class="btn-submit" id="btn-incense-light" onclick="lightIncense()" style="margin-top: 0">點燃線香</button>
           <button class="btn-submit" id="btn-incense-extinguish" onclick="extinguishIncense()" style="margin-top: 0; background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.15)">熄滅</button>
+        </div>
+      </div>
+
+      <!-- 奠酒控制區域 -->
+      <div style="margin-bottom: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--glass-border);">
+        <h3 style="font-size: 0.95rem; color: var(--theme-gold); margin-bottom: 0.8rem; font-family: var(--font-tablet)">奠酒儀式控制</h3>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.8rem;">
+          <div style="font-size: 0.85rem;">
+            狀態：<span id="wine-status" style="color: var(--text-muted)">未奠酒</span>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+          <button class="btn-submit" onclick="pourAllCups()" style="margin-top: 0">一次斟滿</button>
+          <button class="btn-submit" onclick="clearAllCups()" style="margin-top: 0; background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.15)">清空酒杯</button>
         </div>
       </div>
     </section>
@@ -791,16 +865,34 @@
         <!-- 酒杯放置區 -->
         <div class="cups-area">
           <div class="cup-container" onclick="toggleCup(1)">
-            <div style="font-size: 0.7rem; margin-bottom: 2px; color: var(--text-muted)">一巡</div>
-            <div class="wine-cup-placeholder" style="color: var(--theme-gold)">🍷</div>
+            <div style="font-size: 0.7rem; margin-bottom: 4px; color: var(--text-muted)">一巡</div>
+            <div class="wine-cup" id="wine-cup-1">
+              <div class="cup-body">
+                <div class="cup-liquid"></div>
+              </div>
+              <div class="cup-stem"></div>
+              <div class="cup-base"></div>
+            </div>
           </div>
           <div class="cup-container" onclick="toggleCup(2)">
-            <div style="font-size: 0.7rem; margin-bottom: 2px; color: var(--text-muted)">二巡</div>
-            <div class="wine-cup-placeholder" style="color: var(--theme-gold)">🍷</div>
+            <div style="font-size: 0.7rem; margin-bottom: 4px; color: var(--text-muted)">二巡</div>
+            <div class="wine-cup" id="wine-cup-2">
+              <div class="cup-body">
+                <div class="cup-liquid"></div>
+              </div>
+              <div class="cup-stem"></div>
+              <div class="cup-base"></div>
+            </div>
           </div>
           <div class="cup-container" onclick="toggleCup(3)">
-            <div style="font-size: 0.7rem; margin-bottom: 2px; color: var(--text-muted)">三巡</div>
-            <div class="wine-cup-placeholder" style="color: var(--theme-gold)">🍷</div>
+            <div style="font-size: 0.7rem; margin-bottom: 4px; color: var(--text-muted)">三巡</div>
+            <div class="wine-cup" id="wine-cup-3">
+              <div class="cup-body">
+                <div class="cup-liquid"></div>
+              </div>
+              <div class="cup-stem"></div>
+              <div class="cup-base"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -1076,10 +1168,75 @@
       }, duration * 1000);
     }
 
+    // ==========================================
+    // 5.3 斟酒與奠酒三巡 logic
+    // ==========================================
+    function initCups() {
+      AppState.cups.forEach(cup => {
+        updateCupUI(cup.id);
+      });
+    }
+
+    function toggleCup(cupId) {
+      const cup = AppState.cups.find(c => c.id === cupId);
+      if (cup) {
+        cup.filled = !cup.filled;
+        updateCupUI(cup.id);
+      }
+    }
+
+    function updateCupUI(cupId) {
+      const cupIndex = cupId - 1;
+      const cupState = AppState.cups[cupIndex];
+      const cupDom = document.getElementById(`wine-cup-${cupId}`);
+      
+      if (cupDom) {
+        if (cupState.filled) {
+          cupDom.classList.add('filled');
+        } else {
+          cupDom.classList.remove('filled');
+        }
+      }
+      
+      updatePouringStatus();
+    }
+
+    function pourAllCups() {
+      AppState.cups.forEach(cup => {
+        cup.filled = true;
+        updateCupUI(cup.id);
+      });
+    }
+
+    function clearAllCups() {
+      AppState.cups.forEach(cup => {
+        cup.filled = false;
+        updateCupUI(cup.id);
+      });
+    }
+
+    function updatePouringStatus() {
+      const filledCount = AppState.cups.filter(c => c.filled).length;
+      const statusEl = document.getElementById('wine-status');
+      if (!statusEl) return;
+      
+      if (filledCount === 0) {
+        statusEl.innerText = "未奠酒";
+        statusEl.style.color = "#a89f95"; // text-muted
+      } else if (filledCount === 3) {
+        statusEl.innerText = "三巡已完備 (奠酒三巡圓滿)";
+        statusEl.style.color = "#4caf50"; // green
+      } else {
+        statusEl.innerText = `已完成 ${filledCount} 巡`;
+        statusEl.style.color = "#ffd700"; // gold
+      }
+    }
+
     // 視窗載入後初始化
     window.addEventListener('DOMContentLoaded', () => {
       initTablet();
       initIncense();
+      initCups();
     });
   </script>
 </body>
