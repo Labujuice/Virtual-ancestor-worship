@@ -833,6 +833,207 @@
         transform: translateY(0) scale(1.05);
       }
     }
+
+    /* ==========================================
+       細項 5.5: 金爐與火焰樣式
+       ========================================== */
+    .furnace {
+      width: 120px;
+      height: 150px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .furnace-cap {
+      width: 90px;
+      height: 25px;
+      background: radial-gradient(ellipse at bottom, #b8860b 0%, #6e5005 70%);
+      border: 1.5px solid #ffea70;
+      border-radius: 50% 50% 0 0;
+      position: relative;
+      z-index: 2;
+      box-shadow: 0 -2px 5px rgba(0,0,0,0.5);
+    }
+
+    .furnace-cap::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 16px;
+      height: 10px;
+      background: #ffd700;
+      border: 1px solid #b8860b;
+      border-radius: 50% 50% 0 0;
+    }
+
+    .furnace-body {
+      width: 110px;
+      height: 100px;
+      background: radial-gradient(circle at center, #ffd700 -20%, #b8860b 60%, #5c4305 100%);
+      border: 2px solid #ffea70;
+      border-radius: 12px;
+      margin-top: -3px;
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.6), inset 0 2px 5px rgba(255,255,255,0.2);
+    }
+
+    /* 爐身八卦圖紋飾線 */
+    .furnace-body::before {
+      content: '☰ ☱ ☲ ☳ ☴ ☵ ☶ ☷';
+      font-size: 0.65rem;
+      letter-spacing: 1px;
+      color: rgba(255, 234, 112, 0.15);
+      position: absolute;
+      pointer-events: none;
+      z-index: 1;
+      width: 100%;
+      text-align: center;
+      top: 15px;
+    }
+
+    .furnace-mouth {
+      width: 62px;
+      height: 42px;
+      background: #0d0603;
+      border: 3px solid #8b6508;
+      border-radius: 50% 50% 15% 15% / 70% 70% 30% 30%;
+      position: absolute;
+      bottom: 20px;
+      overflow: hidden;
+      box-shadow: inset 0 4px 10px rgba(0,0,0,0.9), 0 2px 4px rgba(255,255,255,0.1);
+      z-index: 2;
+    }
+
+    .furnace-stand {
+      width: 80px;
+      height: 16px;
+      background: linear-gradient(90deg, #5c4305 0%, #b8860b 50%, #5c4305 100%);
+      border: 1.5px solid #ffea70;
+      border-radius: 4px;
+      margin-top: -2px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.6);
+    }
+
+    /* 火焰樣式 */
+    .flame-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 3;
+    }
+
+    .furnace.burning .flame-container {
+      opacity: 1;
+    }
+
+    .flame {
+      position: absolute;
+      bottom: -5px;
+      border-radius: 50% 50% 20% 20% / 80% 80% 20% 20%;
+      transform-origin: bottom center;
+      animation: riseFlame 0.9s infinite alternate ease-in-out;
+      mix-blend-mode: screen;
+      filter: blur(1.5px);
+    }
+
+    .flame-1 {
+      left: 6px;
+      width: 24px;
+      height: 38px;
+      background: radial-gradient(circle at bottom, #ffd700 10%, #ff5722 70%, transparent 100%);
+      animation-duration: 0.7s;
+      animation-delay: 0.1s;
+    }
+
+    .flame-2 {
+      left: 15px;
+      width: 32px;
+      height: 48px;
+      background: radial-gradient(circle at bottom, #ffffff 10%, #ffea70 30%, #ff2200 80%, transparent 100%);
+      animation-duration: 1.1s;
+      animation-delay: 0.3s;
+    }
+
+    .flame-3 {
+      right: 6px;
+      width: 24px;
+      height: 38px;
+      background: radial-gradient(circle at bottom, #ffd700 10%, #ff5722 70%, transparent 100%);
+      animation-duration: 0.8s;
+      animation-delay: 0.2s;
+    }
+
+    @keyframes riseFlame {
+      0% {
+        transform: scale(0.85) rotate(-3deg);
+        filter: brightness(0.9) blur(1.5px);
+      }
+      100% {
+        transform: scale(1.15) rotate(3deg);
+        filter: brightness(1.3) blur(1px);
+      }
+    }
+
+    /* 飛行的金紙動畫 */
+    .flying-joss {
+      position: absolute;
+      width: 45px;
+      height: 30px;
+      background: #f1c40f;
+      border: 1px solid #d35400;
+      border-radius: 1px;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+      z-index: 100;
+      pointer-events: none;
+      animation: flyToFurnace 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+
+    .flying-joss::before {
+      content: '';
+      position: absolute;
+      top: 4px;
+      left: 8px;
+      width: 29px;
+      height: 22px;
+      border: 0.5px solid #c0392b;
+      background: rgba(192, 41, 43, 0.15);
+    }
+
+    .flying-joss::after {
+      content: '';
+      position: absolute;
+      top: 8px;
+      left: 15px;
+      width: 15px;
+      height: 14px;
+      background: linear-gradient(135deg, #ffd700 0%, #d4af37 100%);
+      border: 0.5px solid #b8860b;
+    }
+
+    @keyframes flyToFurnace {
+      0% {
+        transform: translate(0, 0) rotate(0deg) scale(1);
+        opacity: 1;
+      }
+      50% {
+        opacity: 1;
+        transform: translate(60px, -60px) rotate(180deg) scale(0.9);
+      }
+      100% {
+        transform: translate(145px, -15px) rotate(360deg) scale(0.2);
+        opacity: 0;
+      }
+    }
   </style>
 </head>
 <body data-theme="classic-wood">
@@ -1013,8 +1214,49 @@
     <!-- 右側金爐區 -->
     <section class="panel" id="burner-panel">
       <h2 class="panel-title">化金金爐區</h2>
-      <div>
-        <p style="font-size: 0.9rem; color: var(--text-muted)">金爐區域與化金功能準備中...</p>
+      
+      <!-- 金紙餘量與補金紙 -->
+      <div class="burner-status-box" style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 0.8rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05)">
+        <div>
+          <div style="font-size: 0.8rem; color: var(--text-muted)">金紙餘量</div>
+          <div style="font-size: 1.5rem; font-weight: 700; color: var(--theme-gold);" id="joss-count-text">50 張</div>
+        </div>
+        <button class="btn-submit" onclick="refillJossPaper()" style="margin-top: 0; padding: 0.4rem 0.8rem; font-size: 0.8rem;">補滿金紙</button>
+      </div>
+
+      <!-- 互動區域 -->
+      <div class="burner-interactive-area" style="position: relative; height: 260px; background: rgba(0,0,0,0.15); border-radius: 8px; border: 1px dashed rgba(255,255,255,0.05); overflow: hidden; margin: 0.5rem 0;">
+        <!-- 金紙堆疊 -->
+        <div class="joss-stack-container" style="position: absolute; bottom: 20px; left: 15px; display: flex; flex-direction: column-reverse; align-items: center;">
+          <div id="joss-stack" style="position: relative; width: 70px; height: 50px;">
+            <!-- JS動態渲染堆疊 -->
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px;">金紙堆</div>
+        </div>
+
+        <!-- 金爐 -->
+        <div class="burner-container" style="position: absolute; bottom: 20px; right: 15px; display: flex; flex-direction: column; align-items: center;">
+          <div class="furnace" id="furnace">
+            <div class="furnace-cap"></div>
+            <div class="furnace-body">
+              <div class="furnace-mouth">
+                <div class="flame-container" id="flame-container">
+                  <div class="flame flame-1"></div>
+                  <div class="flame flame-2"></div>
+                  <div class="flame flame-3"></div>
+                </div>
+              </div>
+            </div>
+            <div class="furnace-stand"></div>
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px;">八卦金爐</div>
+        </div>
+      </div>
+
+      <!-- 按鈕控制 -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+        <button class="btn-submit" onclick="burnOne()" style="margin-top: 0">燒一張</button>
+        <button class="btn-submit" id="btn-auto-burn" onclick="toggleAutoBurn()" style="margin-top: 0; background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.15)">自動連燒</button>
       </div>
     </section>
   </main>
@@ -1475,12 +1717,175 @@
       }
     }
 
+    // ==========================================
+    // 5.5 化金區與金爐火焰特效 logic
+    // ==========================================
+    let autoBurnIntervalId = null;
+    let flareTimer = null;
+
+    function initBurner() {
+      // 載入初始數量
+      AppState.jossPaperCount = CONFIG.initialJossPaper;
+      updateBurnerUI();
+    }
+
+    function updateBurnerUI() {
+      // 更新文字餘量
+      document.getElementById('joss-count-text').innerText = `${AppState.jossPaperCount} 張`;
+      
+      // 更新金紙堆疊 DOM 渲染
+      const stackDom = document.getElementById('joss-stack');
+      if (!stackDom) return;
+
+      stackDom.innerHTML = '';
+      const count = AppState.jossPaperCount;
+      
+      // 最大只畫 12 層以維持流暢度，每一層代表大約 4 張紙
+      const maxLayers = Math.min(12, Math.ceil(count / 4));
+      for (let i = 0; i < maxLayers; i++) {
+        const layer = document.createElement('div');
+        layer.style.position = 'absolute';
+        layer.style.bottom = `${i * 3}px`;
+        layer.style.left = `${i * 1.2}px`;
+        layer.style.width = '70px';
+        layer.style.height = '12px';
+        layer.style.background = '#f39c12';
+        layer.style.border = '1px solid #d35400';
+        layer.style.boxShadow = '0 1px 2px rgba(0,0,0,0.3)';
+        layer.style.borderRadius = '2px';
+        
+        // 金紙金箔效果
+        const foil = document.createElement('div');
+        foil.style.position = 'absolute';
+        foil.style.width = '24px';
+        foil.style.height = '6px';
+        foil.style.top = '2px';
+        foil.style.left = '22px';
+        foil.style.background = 'linear-gradient(135deg, #ffd700 0%, #d4af37 100%)';
+        foil.style.border = '0.5px solid #b8860b';
+        
+        layer.appendChild(foil);
+        stackDom.appendChild(layer);
+      }
+    }
+
+    function burnOne() {
+      if (AppState.jossPaperCount <= 0) {
+        alert("金紙已經燒完了！請點擊『補滿金紙』。");
+        if (AppState.isBurningGold) {
+          stopAutoBurn();
+        }
+        return;
+      }
+
+      AppState.jossPaperCount--;
+      updateBurnerUI();
+      
+      // 觸發爐口火焰燃燒動畫
+      triggerFlameFlare();
+      
+      // 產生飛行金紙 DOM 動畫
+      spawnFlyingPaper();
+    }
+
+    function triggerFlameFlare() {
+      const furnace = document.getElementById('furnace');
+      if (!furnace) return;
+
+      furnace.classList.add('burning');
+      
+      // 如果不是自動連燒狀態，在火焰動畫完成後(800ms)熄滅火焰
+      if (!AppState.isBurningGold) {
+        if (flareTimer) clearTimeout(flareTimer);
+        flareTimer = setTimeout(() => {
+          if (!AppState.isBurningGold) {
+            furnace.classList.remove('burning');
+          }
+        }, 800);
+      }
+    }
+
+    function spawnFlyingPaper() {
+      const area = document.querySelector('.burner-interactive-area');
+      if (!area) return;
+
+      const paper = document.createElement('div');
+      paper.className = 'flying-joss';
+      paper.style.left = '20px'; // 金紙堆中心點
+      paper.style.bottom = '25px';
+
+      area.appendChild(paper);
+
+      // 動畫播放完畢後移除元素 (CSS 動畫時間為 0.8s)
+      setTimeout(() => {
+        paper.remove();
+      }, 800);
+    }
+
+    function toggleAutoBurn() {
+      if (AppState.isBurningGold) {
+        stopAutoBurn();
+      } else {
+        startAutoBurn();
+      }
+    }
+
+    function startAutoBurn() {
+      if (AppState.isBurningGold) return;
+
+      AppState.isBurningGold = true;
+      
+      const btn = document.getElementById('btn-auto-burn');
+      if (btn) {
+        btn.innerText = "停止連燒";
+        btn.style.background = 'var(--theme-bg-medium)';
+        btn.style.borderColor = 'var(--theme-gold)';
+        btn.style.color = 'var(--theme-gold)';
+      }
+
+      const furnace = document.getElementById('furnace');
+      if (furnace) furnace.classList.add('burning');
+
+      // 立即燒一張，並設定每 500ms 循環燃燒
+      burnOne();
+      autoBurnIntervalId = setInterval(() => {
+        burnOne();
+      }, 500);
+    }
+
+    function stopAutoBurn() {
+      if (!AppState.isBurningGold) return;
+
+      AppState.isBurningGold = false;
+      if (autoBurnIntervalId) {
+        clearInterval(autoBurnIntervalId);
+        autoBurnIntervalId = null;
+      }
+
+      const btn = document.getElementById('btn-auto-burn');
+      if (btn) {
+        btn.innerText = "自動連燒";
+        btn.style.background = 'rgba(255,255,255,0.05)';
+        btn.style.borderColor = 'rgba(255,255,255,0.15)';
+        btn.style.color = 'var(--text-light)';
+      }
+
+      const furnace = document.getElementById('furnace');
+      if (furnace) furnace.classList.remove('burning');
+    }
+
+    function refillJossPaper() {
+      AppState.jossPaperCount = CONFIG.initialJossPaper;
+      updateBurnerUI();
+    }
+
     // 視窗載入後初始化
     window.addEventListener('DOMContentLoaded', () => {
       initTablet();
       initIncense();
       initCups();
       initOfferings();
+      initBurner();
     });
   </script>
 </body>
