@@ -417,7 +417,7 @@
     /* 神桌 (Altar Table) 與擺放區域 */
     .altar-table {
       width: 100%;
-      height: 160px;
+      height: 190px;
       background: linear-gradient(0deg, #110502 0%, var(--theme-bg-medium) 40%, var(--theme-bg-light) 90%, #6f3b25 100%);
       border: 3px solid var(--theme-gold-dark);
       border-top: 6px solid var(--theme-gold);
@@ -432,32 +432,44 @@
       padding: 0.5rem 1rem;
     }
 
-    /* 供品放置插槽 */
+    /* 供品放置插槽 (7個前後排) */
     .offering-slots {
       display: flex;
-      justify-content: space-around;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
       width: 100%;
       margin-top: 5px;
-      gap: 10px;
+    }
+
+    .offering-row {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      gap: 12px;
+    }
+
+    .offering-row.back-row {
+      margin-bottom: 2px;
     }
 
     .offering-slot {
-      width: 70px;
-      height: 70px;
-      border: 1px dashed rgba(255, 215, 0, 0.2);
+      width: 58px;
+      height: 58px;
+      border: 1px dashed rgba(255, 215, 0, 0.18);
       border-radius: 50%;
       display: flex;
       justify-content: center;
       align-items: center;
       position: relative;
-      background: rgba(0, 0, 0, 0.2);
+      background: rgba(0, 0, 0, 0.25);
       transition: all 0.3s ease;
     }
 
     .offering-slot::before {
-      content: '供品位';
-      font-size: 0.65rem;
-      color: rgba(255, 215, 0, 0.25);
+      content: '位';
+      font-size: 0.6rem;
+      color: rgba(255, 215, 0, 0.2);
       position: absolute;
     }
 
@@ -1185,11 +1197,19 @@
           <div class="censer"></div>
         </div>
 
-        <!-- 供品放置插槽 (3個) -->
+        <!-- 供品放置插槽 (7個前後排) -->
         <div class="offering-slots">
-          <div class="offering-slot" id="slot-1"></div>
-          <div class="offering-slot" id="slot-2"></div>
-          <div class="offering-slot" id="slot-3"></div>
+          <div class="offering-row back-row">
+            <div class="offering-slot" id="slot-1" title="後排左一"></div>
+            <div class="offering-slot" id="slot-2" title="後排左二"></div>
+            <div class="offering-slot" id="slot-3" title="後排右二"></div>
+            <div class="offering-slot" id="slot-4" title="後排右一"></div>
+          </div>
+          <div class="offering-row front-row">
+            <div class="offering-slot" id="slot-5" title="前排左"></div>
+            <div class="offering-slot" id="slot-6" title="前排中"></div>
+            <div class="offering-slot" id="slot-7" title="前排右"></div>
+          </div>
         </div>
         
         <!-- 酒杯放置區 -->
@@ -1599,55 +1619,99 @@
     // ==========================================
     const OFFERINGS = [
       {
-        id: "red-tortoise",
-        name: "紅龜粿",
-        desc: "長壽吉祥",
-        svg: `<svg viewBox="0 0 64 64" width="48" height="48">
-          <ellipse cx="32" cy="35" rx="22" ry="16" fill="#e74c3c" stroke="#c0392b" stroke-width="1.5"/>
-          <ellipse cx="32" cy="35" rx="16" ry="10" fill="none" stroke="#f1c40f" stroke-width="1.2" stroke-dasharray="2,2"/>
-          <path d="M 32 21 Q 37 30 32 49 Q 27 30 32 21" fill="none" stroke="#c0392b" stroke-width="1.2"/>
-          <path d="M 17 35 Q 32 35 47 35" fill="none" stroke="#c0392b" stroke-width="1.2"/>
+        id: "chicken",
+        name: "熟全雞",
+        desc: "大吉大利",
+        svg: `<svg viewBox="0 0 64 64" width="42" height="42">
+          <ellipse cx="32" cy="48" rx="22" ry="7" fill="#e5e5e5" stroke="#ccc" stroke-width="0.8"/>
+          <ellipse cx="32" cy="35" rx="16" ry="11" fill="#f39c12" stroke="#d35400" stroke-width="1.2"/>
+          <circle cx="16" cy="30" r="4.5" fill="#f39c12" stroke="#d35400" stroke-width="1.2"/>
+          <polygon points="12,29 9,31 12,33" fill="#e67e22"/>
+          <ellipse cx="38" cy="37" rx="7.5" ry="4.5" fill="#e67e22" stroke="#d35400" stroke-width="1" transform="rotate(15 38 37)"/>
+        </svg>`
+      },
+      {
+        id: "fish",
+        name: "全魚",
+        desc: "年年有餘",
+        svg: `<svg viewBox="0 0 64 64" width="42" height="42">
+          <ellipse cx="32" cy="48" rx="22" ry="7" fill="#e5e5e5" stroke="#ccc" stroke-width="0.8"/>
+          <path d="M 16 38 C 24 30 40 30 46 38 C 40 42 26 42 16 38 Z" fill="#e67e22" stroke="#d35400" stroke-width="1.2"/>
+          <polygon points="46,38 54,33 51,38 54,43" fill="#d35400"/>
+          <path d="M 32 33 Q 36 26 38 33" fill="#d35400"/>
+          <circle cx="20" cy="37" r="0.8" fill="#fff"/>
+        </svg>`
+      },
+      {
+        id: "pork",
+        name: "三層肉",
+        desc: "富足有餘",
+        svg: `<svg viewBox="0 0 64 64" width="42" height="42">
+          <ellipse cx="32" cy="48" rx="20" ry="6.5" fill="#e5e5e5" stroke="#ccc" stroke-width="0.8"/>
+          <path d="M 22 34 L 42 34 L 40 44 L 24 44 Z" fill="#c0392b" stroke="#7b241c" stroke-width="1.2"/>
+          <rect x="23" y="38" width="17" height="3" fill="#f4f6f7"/>
+          <rect x="22" y="34" width="20" height="2" fill="#7b241c"/>
+        </svg>`
+      },
+      {
+        id: "pineapple",
+        name: "鳳梨",
+        desc: "好運旺來",
+        svg: `<svg viewBox="0 0 64 64" width="42" height="42">
+          <path d="M 32 10 Q 32 21 32 21 M 28 12 Q 32 21 32 21 M 36 12 Q 32 21 32 21" stroke="#27ae60" stroke-width="2" stroke-linecap="round"/>
+          <ellipse cx="32" cy="33" rx="12" ry="16" fill="#f1c40f" stroke="#d35400" stroke-width="1.2"/>
+          <path d="M 24 26 L 40 40 M 22 33 L 35 46 M 28 20 L 41 33 M 40 26 L 24 40 M 41 33 L 28 46 M 35 20 L 22 33" stroke="#d35400" stroke-width="0.8" opacity="0.6"/>
         </svg>`
       },
       {
         id: "apple",
         name: "紅蘋果",
         desc: "平平安安",
-        svg: `<svg viewBox="0 0 64 64" width="48" height="48">
+        svg: `<svg viewBox="0 0 64 64" width="42" height="42">
           <path d="M 36 12 Q 44 8 40 18 Q 35 15 36 12 Z" fill="#2ecc71" />
-          <path d="M 32 19 Q 34 12 36 12" fill="none" stroke="#7e5109" stroke-width="2.5" stroke-linecap="round"/>
-          <path d="M 32 21 C 22 19 14 27 16 39 C 18 51 28 53 32 49 C 36 53 46 51 48 39 C 50 27 42 19 32 21 Z" fill="#e74c3c" stroke="#c0392b" stroke-width="1.5"/>
-          <ellipse cx="24" cy="29" rx="3.5" ry="6" fill="#ff7675" transform="rotate(-15 24 29)" opacity="0.6"/>
+          <path d="M 32 19 Q 34 12 36 12" fill="none" stroke="#7e5109" stroke-width="2" stroke-linecap="round"/>
+          <path d="M 32 21 C 22 19 14 27 16 39 C 18 51 28 53 32 49 C 36 53 46 51 48 39 C 50 27 42 19 32 21 Z" fill="#e74c3c" stroke="#c0392b" stroke-width="1.2"/>
+          <ellipse cx="24" cy="29" rx="3" ry="5" fill="#ff7675" transform="rotate(-15 24 29)" opacity="0.6"/>
         </svg>`
       },
       {
         id: "orange",
         name: "吉利橘",
         desc: "大吉大利",
-        svg: `<svg viewBox="0 0 64 64" width="48" height="48">
+        svg: `<svg viewBox="0 0 64 64" width="42" height="42">
           <path d="M 34 14 Q 42 10 38 20 Q 33 17 34 14 Z" fill="#27ae60" />
-          <path d="M 32 20 Q 33 14 35 14" fill="none" stroke="#7e5109" stroke-width="2" stroke-linecap="round"/>
-          <circle cx="32" cy="35" r="19" fill="#e67e22" stroke="#d35400" stroke-width="1.5"/>
-          <ellipse cx="25" cy="27" rx="3.5" ry="5" fill="#f39c12" transform="rotate(-20 25 27)" opacity="0.6"/>
-          <circle cx="20" cy="40" r="0.6" fill="#d35400"/>
-          <circle cx="42" cy="34" r="0.6" fill="#d35400"/>
-          <circle cx="35" cy="44" r="0.6" fill="#d35400"/>
+          <path d="M 32 20 Q 33 14 35 14" fill="none" stroke="#7e5109" stroke-width="1.8" stroke-linecap="round"/>
+          <circle cx="32" cy="35" r="16" fill="#e67e22" stroke="#d35400" stroke-width="1.2"/>
+          <ellipse cx="25" cy="27" rx="3" ry="4" fill="#f39c12" transform="rotate(-20 25 27)" opacity="0.6"/>
+          <circle cx="20" cy="38" r="0.5" fill="#d35400"/>
+          <circle cx="40" cy="34" r="0.5" fill="#d35400"/>
+        </svg>`
+      },
+      {
+        id: "red-tortoise",
+        name: "紅龜粿",
+        desc: "長壽吉祥",
+        svg: `<svg viewBox="0 0 64 64" width="42" height="42">
+          <ellipse cx="32" cy="35" rx="19" ry="14" fill="#e74c3c" stroke="#c0392b" stroke-width="1.2"/>
+          <ellipse cx="32" cy="35" rx="14" ry="9" fill="none" stroke="#f1c40f" stroke-width="1" stroke-dasharray="2,2"/>
+          <path d="M 32 22 Q 36 30 32 47 Q 28 30 32 22" fill="none" stroke="#c0392b" stroke-width="1"/>
+          <path d="M 18 35 Q 32 35 46 35" fill="none" stroke="#c0392b" stroke-width="1"/>
         </svg>`
       },
       {
         id: "fa-gao",
         name: "發粿",
         desc: "發財興旺",
-        svg: `<svg viewBox="0 0 64 64" width="48" height="48">
-          <path d="M 17 38 L 21 52 A 11 5 0 0 0 43 52 L 47 38 Z" fill="#d35400" stroke="#a04000" stroke-width="1.5"/>
-          <path d="M 13 38 Q 9 30 19 28 Q 23 20 32 22 Q 41 20 45 28 Q 55 30 51 38 Z" fill="#f39c12" stroke="#d35400" stroke-width="1.5"/>
-          <path d="M 32 22 L 32 32 M 25 27 L 35 27" stroke="#b33f00" stroke-width="2" stroke-linecap="round"/>
+        svg: `<svg viewBox="0 0 64 64" width="42" height="42">
+          <path d="M 19 38 L 22 50 A 9 4 0 0 0 42 50 L 45 38 Z" fill="#d35400" stroke="#a04000" stroke-width="1.2"/>
+          <path d="M 15 38 Q 11 30 20 28 Q 23 20 32 22 Q 41 20 44 28 Q 53 30 49 38 Z" fill="#f39c12" stroke="#d35400" stroke-width="1.2"/>
+          <path d="M 32 22 L 32 30 M 26 26 L 36 26" stroke="#b33f00" stroke-width="1.5" stroke-linecap="round"/>
         </svg>`
       }
     ];
 
-    // 初始化供品資料結構，預設 3 個插槽皆為空 (null)
-    AppState.currentOfferings = [null, null, null];
+    // 初始化供品資料結構，預設 7 個插槽皆為空 (null)
+    AppState.currentOfferings = [null, null, null, null, null, null, null];
 
     function initOfferings() {
       renderOfferingSelectionList();
@@ -1697,9 +1761,9 @@
       renderPlacedOfferings();
     }
 
-    // 渲染神桌上的供品
+    // 渲染神桌上的供品 (支援 7 個位置)
     function renderPlacedOfferings() {
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < 7; i++) {
         const slotDom = document.getElementById(`slot-${i + 1}`);
         if (!slotDom) continue;
 
