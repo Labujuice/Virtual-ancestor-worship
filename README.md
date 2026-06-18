@@ -56,7 +56,7 @@ const CONFIG = {
   // 祖先牌位文字 (由上至下直書)
   tablet: {
     leftColumn: "西元二零二六端午吉旦", // 左側紀年（生卒或節日）
-    centerColumn: "詹氏歷代祖先神位",   // 正中牌位主文字
+    centerColumn: "XX氏歷代祖先神位",   // 正中牌位主文字
     rightColumn: "陽上子孫叩拜"         // 右側落款
   },
   // 初始金紙數量
