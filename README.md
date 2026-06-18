@@ -72,6 +72,22 @@ const CONFIG = {
 };
 ```
 
+## 🌐 部署至 GitHub Pages
+
+由於本專案為單一 HTML 檔案且無須任何後端伺服器，因此非常適合直接使用免費的 GitHub Pages 部署上線，讓親友也可以直接透過網址開啟數位公媽廳祭拜：
+
+1. **上傳至 GitHub 倉庫**：
+   * 將本專案的所有檔案推送至您的 GitHub 儲存庫（Repository）。
+2. **開啟 Pages 設定**：
+   * 進入該 Repository 的頁面，點選上方選單中的 **Settings (設定)**。
+   * 在左側選單中找到並點擊 **Pages**（位於 Code and automation 區塊下）。
+3. **設定部署分支**：
+   * 在 **Build and deployment** -> **Source** 選擇 `Deploy from a branch`（預設值）。
+   * 在 **Branch** 選擇 `master` (或 `main`) 分支，目錄選擇 `/ (root)`，隨後點擊右側的 **Save (儲存)**。
+4. **驗收部署結果**：
+   * 等待 1~2 分鐘後，重新整理該設定頁面，頂部會出現您的專屬網址（例如：`https://<您的 GitHub 帳號>.github.io/Virtual-ancestor-worship/`）。
+   * 點擊網址即可在線上進行祭祀儀式！
+
 ---
 
 ## 🛠️ 技術規格
