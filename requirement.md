@@ -102,7 +102,7 @@ const AppState = {
 - [x] **細項 5.3：斟酒互動系統 (Wine Cup Interaction)**
   * **實作目的**：點擊酒杯即可完成「奠酒三巡」的動作。
   * **實作說明**：酒杯使用 SVG 或 CSS 圓角繪製。當點擊個別酒杯時，酒杯內部的液體層利用 `transform: scaleY(0)` 到 `scaleY(1)` 的動態升起。
-- [ ] **細項 5.4：動態供品擺放系統 (Offering Position Management)**
+- [x] **細項 5.4：動態供品擺放系統 (Offering Position Management)**
   * **實作目的**：讓使用者自由挑選合適的節慶供品，並整齊排放在神桌上。
   * **實作說明**：在左側選單中建立供品清單。點選後，將該供品資料 Push 進 `AppState.currentOfferings` 並觸發 Render 機制。神桌上預設數個絕對定位的「聖位插槽」，當供品被啟用時，以漸顯與輕微下沉的動畫置入插槽中。
 - [ ] **細項 5.5：化金區與金爐火焰特效 (Joss Paper Burner)**

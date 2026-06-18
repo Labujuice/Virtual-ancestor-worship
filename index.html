@@ -727,6 +727,112 @@
       border-radius: 3px 3px 0 0;
       box-shadow: 0 2px 4px rgba(0,0,0,0.5);
     }
+
+    /* ==========================================
+       細項 5.4: 供品與插槽樣式
+       ========================================== */
+    .offering-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.8rem;
+    }
+
+    .offering-btn {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      padding: 0.8rem 0.5rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.25s ease;
+      color: var(--text-light);
+      position: relative;
+    }
+
+    .offering-btn:hover {
+      background: rgba(255, 215, 0, 0.08);
+      border-color: var(--theme-gold);
+      transform: translateY(-2px);
+    }
+
+    .offering-btn.active {
+      background: rgba(255, 215, 0, 0.12);
+      border-color: var(--theme-gold);
+      box-shadow: 0 0 10px var(--theme-shadow);
+    }
+
+    .offering-btn .offering-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-light);
+      font-family: var(--font-tablet);
+    }
+
+    .offering-btn .offering-desc {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .offering-btn .offering-status-tag {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      font-size: 0.6rem;
+      background: var(--theme-bg-medium);
+      color: var(--theme-gold);
+      padding: 1px 4px;
+      border-radius: 3px;
+      border: 0.5px solid var(--theme-gold-dark);
+      display: none;
+    }
+
+    .offering-btn.active .offering-status-tag {
+      display: block;
+    }
+
+    .offering-item-placed {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      top: -24px; /* 懸浮於插槽稍上方，製造置於桌面視覺 */
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      animation: placeOffering 0.5s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .offering-item-placed svg {
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
+    }
+
+    .offering-label {
+      font-size: 0.6rem;
+      background: rgba(15, 10, 10, 0.85);
+      color: var(--theme-gold);
+      padding: 1px 4px;
+      border-radius: 3px;
+      margin-top: -4px;
+      border: 0.5px solid var(--theme-gold-dark);
+      white-space: nowrap;
+      pointer-events: none;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    @keyframes placeOffering {
+      0% {
+        opacity: 0;
+        transform: translateY(-25px) scale(0.5);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1.05);
+      }
+    }
   </style>
 </head>
 <body data-theme="classic-wood">
@@ -793,9 +899,15 @@
           <button class="btn-submit" onclick="clearAllCups()" style="margin-top: 0; background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.15)">清空酒杯</button>
         </div>
       </div>
+
+      <div style="margin-bottom: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--glass-border);">
+        <h3 style="font-size: 0.95rem; color: var(--theme-gold); margin-bottom: 0.8rem; font-family: var(--font-tablet)">供品擺放選單</h3>
+        <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.8rem;">點擊供品可直接擺上神桌或收回。神桌共有三個供品空位。</p>
+        <div class="offering-list" id="offering-selection-list">
+        </div>
+      </div>
     </section>
 
-    <!-- 中央祭祀區 -->
     <section class="altar-container" id="altar-section">
       <div class="altar-decoration"></div>
       <div class="smoke-layer" id="smoke-layer"></div>
@@ -1232,11 +1344,143 @@
       }
     }
 
+    // ==========================================
+    // 5.4 動態供品擺放系統 logic
+    // ==========================================
+    const OFFERINGS = [
+      {
+        id: "red-tortoise",
+        name: "紅龜粿",
+        desc: "長壽吉祥",
+        svg: `<svg viewBox="0 0 64 64" width="48" height="48">
+          <ellipse cx="32" cy="35" rx="22" ry="16" fill="#e74c3c" stroke="#c0392b" stroke-width="1.5"/>
+          <ellipse cx="32" cy="35" rx="16" ry="10" fill="none" stroke="#f1c40f" stroke-width="1.2" stroke-dasharray="2,2"/>
+          <path d="M 32 21 Q 37 30 32 49 Q 27 30 32 21" fill="none" stroke="#c0392b" stroke-width="1.2"/>
+          <path d="M 17 35 Q 32 35 47 35" fill="none" stroke="#c0392b" stroke-width="1.2"/>
+        </svg>`
+      },
+      {
+        id: "apple",
+        name: "紅蘋果",
+        desc: "平平安安",
+        svg: `<svg viewBox="0 0 64 64" width="48" height="48">
+          <path d="M 36 12 Q 44 8 40 18 Q 35 15 36 12 Z" fill="#2ecc71" />
+          <path d="M 32 19 Q 34 12 36 12" fill="none" stroke="#7e5109" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M 32 21 C 22 19 14 27 16 39 C 18 51 28 53 32 49 C 36 53 46 51 48 39 C 50 27 42 19 32 21 Z" fill="#e74c3c" stroke="#c0392b" stroke-width="1.5"/>
+          <ellipse cx="24" cy="29" rx="3.5" ry="6" fill="#ff7675" transform="rotate(-15 24 29)" opacity="0.6"/>
+        </svg>`
+      },
+      {
+        id: "orange",
+        name: "吉利橘",
+        desc: "大吉大利",
+        svg: `<svg viewBox="0 0 64 64" width="48" height="48">
+          <path d="M 34 14 Q 42 10 38 20 Q 33 17 34 14 Z" fill="#27ae60" />
+          <path d="M 32 20 Q 33 14 35 14" fill="none" stroke="#7e5109" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="32" cy="35" r="19" fill="#e67e22" stroke="#d35400" stroke-width="1.5"/>
+          <ellipse cx="25" cy="27" rx="3.5" ry="5" fill="#f39c12" transform="rotate(-20 25 27)" opacity="0.6"/>
+          <circle cx="20" cy="40" r="0.6" fill="#d35400"/>
+          <circle cx="42" cy="34" r="0.6" fill="#d35400"/>
+          <circle cx="35" cy="44" r="0.6" fill="#d35400"/>
+        </svg>`
+      },
+      {
+        id: "fa-gao",
+        name: "發粿",
+        desc: "發財興旺",
+        svg: `<svg viewBox="0 0 64 64" width="48" height="48">
+          <path d="M 17 38 L 21 52 A 11 5 0 0 0 43 52 L 47 38 Z" fill="#d35400" stroke="#a04000" stroke-width="1.5"/>
+          <path d="M 13 38 Q 9 30 19 28 Q 23 20 32 22 Q 41 20 45 28 Q 55 30 51 38 Z" fill="#f39c12" stroke="#d35400" stroke-width="1.5"/>
+          <path d="M 32 22 L 32 32 M 25 27 L 35 27" stroke="#b33f00" stroke-width="2" stroke-linecap="round"/>
+        </svg>`
+      }
+    ];
+
+    // 初始化供品資料結構，預設 3 個插槽皆為空 (null)
+    AppState.currentOfferings = [null, null, null];
+
+    function initOfferings() {
+      renderOfferingSelectionList();
+      renderPlacedOfferings();
+    }
+
+    // 渲染左側選單的供品按鈕
+    function renderOfferingSelectionList() {
+      const container = document.getElementById('offering-selection-list');
+      if (!container) return;
+
+      container.innerHTML = OFFERINGS.map(offering => {
+        const isPlaced = AppState.currentOfferings.includes(offering.id);
+        const activeClass = isPlaced ? 'active' : '';
+        const slotIndex = AppState.currentOfferings.indexOf(offering.id);
+        const slotText = isPlaced ? `位 ${slotIndex + 1}` : '';
+
+        return `
+          <button class="offering-btn ${activeClass}" onclick="toggleOffering('${offering.id}')" id="offering-btn-${offering.id}">
+            <span class="offering-status-tag" id="offering-tag-${offering.id}">${slotText}</span>
+            ${offering.svg}
+            <div class="offering-title">${offering.name}</div>
+            <div class="offering-desc">${offering.desc}</div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    // 點擊供品：如果在桌上就收回，否則找空位擺上
+    function toggleOffering(offeringId) {
+      const placedIndex = AppState.currentOfferings.indexOf(offeringId);
+      
+      if (placedIndex !== -1) {
+        // 已在桌上，收回
+        AppState.currentOfferings[placedIndex] = null;
+      } else {
+        // 未在桌上，尋找第一個空位放置
+        const emptyIndex = AppState.currentOfferings.indexOf(null);
+        if (emptyIndex === -1) {
+          alert("供品桌已擺滿！請先點擊桌上的供品或收回既有供品。");
+          return;
+        }
+        AppState.currentOfferings[emptyIndex] = offeringId;
+      }
+
+      renderOfferingSelectionList();
+      renderPlacedOfferings();
+    }
+
+    // 渲染神桌上的供品
+    function renderPlacedOfferings() {
+      for (let i = 0; i < 3; i++) {
+        const slotDom = document.getElementById(`slot-${i + 1}`);
+        if (!slotDom) continue;
+
+        const offeringId = AppState.currentOfferings[i];
+        if (offeringId) {
+          const offering = OFFERINGS.find(o => o.id === offeringId);
+          slotDom.classList.add('filled');
+          // 點擊神桌上的供品也可以直接收回
+          slotDom.onclick = () => toggleOffering(offeringId);
+          slotDom.style.cursor = "pointer";
+          slotDom.innerHTML = `
+            <div class="offering-item-placed">
+              ${offering.svg}
+              <div class="offering-label">${offering.name}</div>
+            </div>
+          `;
+        } else {
+          slotDom.classList.remove('filled');
+          slotDom.onclick = null;
+          slotDom.style.cursor = "default";
+          slotDom.innerHTML = '';
+        }
+      }
+    }
+
     // 視窗載入後初始化
     window.addEventListener('DOMContentLoaded', () => {
       initTablet();
       initIncense();
       initCups();
+      initOfferings();
     });
   </script>
 </body>
