@@ -692,7 +692,7 @@
       border-radius: 50%;
       display: none;
       box-shadow: 0 0 8px #ff4500, 0 0 15px #ffea70;
-      animation: incenseGlow 0.9s infinite ease-in-out; /* 改為更真實的呼吸閃爍 */
+      /* 呼吸動畫改由 JS 進行動態隨機控制以達最逼真的有機火星明滅效果 */
     }
 
     .incense-stick.lit .incense-tip {
@@ -1474,6 +1474,34 @@
       updateIncenseUI();
     }
 
+    // 啟動香頭火星隨機呼吸與閃爍動畫
+    function startEmberFlicker(tip) {
+      function flicker() {
+        if (!AppState.incense.isLit) {
+          // 熄滅時重置為預設樣式
+          tip.style.transform = '';
+          tip.style.opacity = '';
+          tip.style.boxShadow = '';
+          return;
+        }
+        
+        // 隨機產生呼吸縮放比例 (0.8 到 1.35)
+        const scale = 0.8 + Math.random() * 0.55;
+        // 隨機亮度透明度 (0.75 到 1.0)
+        const opacity = 0.75 + Math.random() * 0.25;
+        // 隨機光暈半徑 (5px 到 12px)
+        const glowRadius = 5 + Math.random() * 7;
+        
+        tip.style.transform = `translate(-50%, -50%) scale(${scale})`;
+        tip.style.opacity = opacity;
+        tip.style.boxShadow = `0 0 ${glowRadius}px #ff4500, 0 0 ${glowRadius * 2.2}px #ffea70`;
+        
+        // 隨機延時 70ms ~ 220ms 以進行下一次有機閃爍
+        setTimeout(flicker, 70 + Math.random() * 150);
+      }
+      flicker();
+    }
+
     function toggleIncense() {
       if (AppState.incense.isLit) {
         extinguishIncense();
@@ -1492,9 +1520,13 @@
 
       AppState.incense.isLit = true;
       
-      // 點亮線香 DOM
+      // 點亮線香 DOM，並啟動動態隨機火星呼吸
       document.querySelectorAll('.incense-stick').forEach(stick => {
         stick.classList.add('lit');
+        const tip = stick.querySelector('.incense-tip');
+        if (tip) {
+          startEmberFlicker(tip);
+        }
       });
 
       // 更新控制面板狀態
